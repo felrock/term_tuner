@@ -19,23 +19,27 @@ GUITAR_STRING_FREQS = {
 def callback(in_data, frame_count, time_info, status):
     """ callback for playback data """
     np_data = np.fromstring(in_data, dtype=np.int16)
-    p = 20*np.log10(np.abs(np.fft.rfft(np_data)))
-    f = np.linspace(0, RATE/2.0, len(p))
-    pair_pf = zip(p, f)
 
+    # get frequency buckets
+    p_decibel = 20*np.log10(np.abs(np.fft.rfft(np_data)))
+    freq = np.linspace(0, RATE/2.0, len(p_decibel))
+    pair_pf = zip(p_decibel, freq)
+    
+    # find the fq with the highest power
     amp = -1
     fq = 0
     for ppf in pair_pf:
         if ppf[0] > amp:
             amp = ppf[0]
             fq = ppf[1]
-
+    
+    # see which string the highst fq matches
     string = ""
-    dst = len(p)
+    delta_freq = len(p_decibel)
     for gs, gfq in GUITAR_STRING_FREQS.items():
         dfq = abs(gfq - fq)
-        if abs(gfq - fq) < dst:
-            dst = dfq
+        if abs(gfq - fq) < delta_freq:
+            delta_freq = dfq
             string = gs
     print("String: ", string)
 
