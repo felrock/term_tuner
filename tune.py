@@ -2,10 +2,11 @@ import wave
 import time
 
 import pyaudio
+import audioop
 
 def callback(in_data, frame_count, time_info, status):
     """ callback for playback data """
-    print(len(in_data))
+    print(audioop.rms(in_data, 2))
     # If len(data) is less than requested frame_count, PyAudio automatically
     # assumes the stream is finished, and the stream stops.
     return (in_data, pyaudio.paContinue)
