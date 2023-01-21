@@ -27,13 +27,18 @@ def callback(in_data, frame_count, time_info, status):
     
     # find the fq with the highest power
     amp = -1
-    fq = 0
-    for ppf in pair_pf:
-        if ppf[0] > amp:
-            amp = ppf[0]
-            fq = ppf[1]
+    idx = 0
+    for i in range(len(freq)-10):
+        val = sum(p_decibel[i:i+10])
+        if val > amp:
+            amp = val
+            idx = i+5
     
+    print("interval: ", end="")
+    for i in range(-5, 5):
+
     # see which string the highst fq matches
+    fq = freq[idx]
     string = ""
     delta_freq = len(p_decibel)
     for gs, gfq in GUITAR_STRING_FREQS.items():
@@ -41,7 +46,7 @@ def callback(in_data, frame_count, time_info, status):
         if abs(gfq - fq) < delta_freq:
             delta_freq = dfq
             string = gs
-    print("String: ", string)
+    # print("String: ", string)
 
     # If len(data) is less than requested frame_count, PyAudio automatically
     # assumes the stream is finished, and the stream stops.
